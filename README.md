@@ -177,13 +177,23 @@ Fluxo unificado com ramificações para `questionario` e `proprietarios`, contro
 
 ## Reprocessamento manual
 
-Para reprocessar manualmente:
+Em alguns casos pode ser necessário realizar um reprocessamento manual dos dados em produção (PRD).
 
-1. Acesse o bucket LND e exclua o arquivo da pasta desejada:
-   - `monitor-alpha-lnd/alphabrand/questionario`
-   - `monitor-alpha-lnd/alphabrand/proprietarios`
-2. Após excluir, acione manualmente o Scheduler correspondente via Console ou `gcloud`.
-3. O processo irá baixar novamente o arquivo do Sharepoint e refazer o processamento.
+Para isso, siga os passos abaixo:
+
+- Primeiro, acesse o bucket LND e vá até a pasta do arquivo que deseja reprocessar:
+  - Para **proprietários**: `monitor-alpha-lnd-xyz123/alphabrand/proprietarios`
+  - Para **questionário**: `monitor-alpha-lnd-xyz123/alphabrand/questionario`
+- É necessário excluir o arquivo existente nessa pasta para que o processo identifique que precisa buscá-lo novamente no Sharepoint.  
+  Caso não tenha permissão para excluir o arquivo, solicite a alguém que possua.
+
+- Após excluir o arquivo, acione manualmente o Scheduler correspondente ao fluxo que deseja reprocessar:
+  - Para **proprietários**: `monitor-alpha-extract-sharepoint-cloudfunction-proprietarios`
+  - Para **questionário**: `monitor-alpha-extract-sharepoint-cloudfunction-questionario`
+
+- Ao ser acionada, a Cloud Function irá verificar o bucket LND, não encontrará o arquivo e iniciará o download do Sharepoint, processando os dados via Dataproc e carregando nas tabelas finais do BigQuery.
+
+- Após a execução, valide se os dados foram carregados corretamente nas tabelas finais no BigQuery.
 
 ## Dataproc Workflow Templates
 
